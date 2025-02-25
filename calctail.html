@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Calculator</title>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    backdropBlur: {
+                        lg: '16px',
+                    }
+                }
+            }
+        };
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom animation for fadeIn */
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+        /* Fallback for backdrop blur */
+        .calculator {
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-[#1d2b38] to-[#283e4e] min-h-screen flex justify-center items-center text-white font-roboto">
+    <!-- Calculator div with proper backdrop blur -->
+    <div class="calculator bg-white/20 backdrop-blur-lg rounded-2xl p-10 w-[400px] shadow-2xl fade-in">
+        <input
+            type="text"
+            id="calculator-display"
+            disabled
+            placeholder="0"
+            class="w-full h-20 text-right text-5xl px-4 mb-6 bg-[#1c2938] rounded-xl shadow-inner focus:shadow-lg transition-shadow outline-none"
+        />
+        <div class="top-buttons flex justify-between mb-4">
+            <button id="clear-button" class="button bg-red-500 hover:bg-red-600 text-white text-3xl px-8 py-5 rounded-xl transition-all hover:scale-105 active:translate-y-1 shadow-lg">C</button>
+            <button id="backspace-button" class="button bg-purple-600 hover:bg-purple-700 text-white text-3xl px-8 py-5 rounded-xl transition-all hover:scale-105 active:translate-y-1 shadow-lg">←</button>
+        </div>
+        <div class="buttons grid grid-cols-4 gap-3">
+            <button data-value="7" class="button">7</button>
+            <button data-value="8" class="button">8</button>
+            <button data-value="9" class="button">9</button>
+            <button data-value="+" class="button bg-orange-500">+</button>
+
+            <button data-value="4" class="button">4</button>
+            <button data-value="5" class="button">5</button>
+            <button data-value="6" class="button">6</button>
+            <button data-value="-" class="button bg-orange-500">-</button>
+
+            <button data-value="1" class="button">1</button>
+            <button data-value="2" class="button">2</button>
+            <button data-value="3" class="button">3</button>
+            <button data-value="*" class="button bg-orange-500">×</button>
+
+            <button data-value="0" class="button">0</button>
+            <button data-value="." class="button">.</button>
+            <button data-value="/" class="button bg-orange-500">÷</button>
+            <button id="equals-button" class="button bg-green-500">=</button>
+        </div>
+    </div>
+
+    <script>
+        const displayElement = document.getElementById('calculator-display');
+        const clearButton = document.getElementById('clear-button');
+        const backspaceButton = document.getElementById('backspace-button');
+        const equalsButton = document.getElementById('equals-button');
+        const numberButtons = document.querySelectorAll('.button[data-value]');
+
+        // Event listeners for number buttons
+        numberButtons.forEach(button => {
+            button.addEventListener('click', () => appendToDisplay(button.getAttribute('data-value')));
+        });
+
+        clearButton.addEventListener('click', clearDisplay);
+        backspaceButton.addEventListener('click', backspace);
+        equalsButton.addEventListener('click', calculate);
+
+        function appendToDisplay(value) {
+            if (displayElement.value === 'Error') {
+                displayElement.value = ''; // Reset on error state
+            }
+            displayElement.value += value;
+        }
+
+        function clearDisplay() {
+            displayElement.value = '';
+        }
+
+        function backspace() {
+            displayElement.value = displayElement.value.slice(0, -1);
+        }
+
+        function calculate() {
+            try {
+                let expression = displayElement.value
+                    .replace(/×/g, '*')  // Replacing '×' with '*'
+                    .replace(/÷/g, '/'); // Replacing '÷' with '/'
+
+                const result = eval(expression);
+
+                if (result === Infinity || result === -Infinity || isNaN(result)) {
+                    throw new Error('Invalid Calculation');
+                }
+
+                displayElement.value = result;
+            } catch (error) {
+                displayElement.value = 'Error';
+            }
+        }
+
+        // Apply styling to buttons dynamically
+        document.querySelectorAll('.button').forEach(button => {
+            button.classList.add(
+                'bg-gray-700', 'hover:bg-gray-600', 'text-white', 'text-3xl', 'px-8', 'py-5',
+                'rounded-xl', 'transition-all', 'hover:scale-105', 'active:translate-y-1', 'shadow-lg'
+            );
+        });
+
+        // Special styling for operators
+        document.querySelectorAll('.button.bg-orange-500, .button.bg-green-500').forEach(button => {
+            button.classList.remove('bg-gray-700', 'hover:bg-gray-600');
+            button.classList.add('hover:bg-opacity-80');
+        });
+
+    </script>
+</body>
+</html>
